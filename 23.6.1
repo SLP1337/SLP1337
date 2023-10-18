@@ -1,0 +1,110 @@
+Для выполнения данного задания вам потребуется создать файл extensions.py и установить две библиотеки: pytelegrambotapi и requests. Установить их можно с помощью следующей команды:
+
+pip install pytelegrambotapi requests
+Ниже приведен пример кода для реализации такого Telegram-бота с использованием класса в файле extensions.py:
+
+import json
+import requests
+import telebot
+
+
+class APIException(Exception):
+    def __init__(self, message):
+        self.message = message
+
+
+class CurrencyConverter:
+    @staticmethod
+    def get_price(base: str, quote: str, amount: float) -> float:
+        base = base.upper()
+        quote = quote.upper()
+
+        if base == quote:
+            return amount
+
+        response = requests.get(f'https://api.exchangerate-api.com/v4/latest/{base}')
+        data = json.loads(response.text)
+
+        if 'error' in data:
+            raise APIException(data['error'])
+
+        if quote not in data['rates']:
+            raise APIException(f'Unknown quote currency: {quote}')
+
+        rate = data['rates'][quote]
+        result = round(rate * amount, 2)
+        return result
+
+
+def start(bot, message):
+    text = 'Привет! Я бот для конвертации валют. Чтобы узнать цену на валюту, отправь мне сообщение в формате ' \
+           '<имя валюты, цену которой ты хочешь узнать> <имя валюты, в которой надо узнать цену первой валюты> ' \
+           '<количество первой валюты>. Например: "доллар рубль 10".'
+
+    bot.reply_to(message, text)
+
+
+def help_(bot, message):
+    text = 'Инструкции по использованию бота:\n\n' \
+           '1. Отправь мне сообщение в формате: <имя валюты, цену которой ты хочешь узнать> ' \
+           '<имя валюты, в которой надо узнать цену первой валюты> <количество первой валюты>.\n' \
+           '   Например: "доллар рубль 10".\n' \
+           '2. Воспользуйся командой /values, чтобы получить информацию о всех доступных валютах.\n' \
+           '3. Если у тебя возникли вопросы или нужна помощь, используй команду /help.'
+
+    bot.reply_to(message, text)
+
+
+def values(bot, message):
+    text = 'Доступные валюты:\n\n' \
+           'Доллар (USD)\n' \
+           'Евро (EUR)\n' \
+           'Рубль (RUB)'
+
+    bot.reply_to(message, text)
+
+
+def convert_currency(bot, message):
+    try:
+        text = message.text.lower()
+        base_currency, quote_currency, amount = text.split()
+
+        result = CurrencyConverter.get_price(base_currency, quote_currency, float(amount))
+        reply_text = f'{amount} {base_currency.upper()} = {result} {quote_currency.upper()}'
+    except ValueError:
+        reply_text = 'Неправильный формат ввода. Пожалуйста, отправь сообщение в формате ' \
+                     '<имя валюты> <имя валюты> <количество>'
+    except APIException as e:
+        reply_text = f'Ошибка: {e.message}'
+    except Exception:
+        reply_text = 'Произошла ошибка при обработке запроса. Попробуй позже.'
+
+    bot.reply_to(message, reply_text)
+
+
+def main():
+    # Чтение токена бота из конфигурационного файла
+    with open('config.py', 'r') as f:
+        token = f.read().strip()
+
+    bot = telebot.TeleBot(token)
+
+    bot.add_message_handler(telebot.filters.CommandFilter(["start"]), start)
+    bot.add_message_handler(telebot.filters.CommandFilter(["help"]), help_)
+    bot.add_message_handler(telebot.filters.CommandFilter(["values"]), values)
+    bot.add_message_handler(convert_currency)
+
+    bot.polling()
+
+
+if __name__ == '__main__':
+    main()
+    
+В этом примере используется простой обработчик команд /start, /help и /values, а также обработчик для конвертации валют.
+
+Для работы бота необходимо добавить файл config.py, в котором будет храниться токен Telegram-бота. Файл config.py должен содержать только строку с токеном:
+
+TOKEN = 'YOUR_BOT_TOKEN'
+После того как файл extensions.py и файл config.py будут созданы и заполнены, вы можете запустить бота, выполнив следующую команду:
+
+python extensions.py
