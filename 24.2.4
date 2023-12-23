@@ -1,0 +1,59 @@
+Калькулятор
+Директории и файлы проекта выглядят следующим образом:
+
+ 
+calculator/
+    |- src/
+        |- calculator.py
+    |- tests/
+        |- test_calculator.py
+        
+calculator.py будет содержать реализацию калькулятора, а test_calculator.py - модуль с позитивными тестами для каждого метода.
+
+Структура calculator.py:
+
+ 
+class Calculator:
+    def add(self, num1, num2):
+        return num1 + num2
+
+    def subtract(self, num1, num2):
+        return num1 - num2
+
+    def multiply(self, num1, num2):
+        return num1 * num2
+
+    def divide(self, num1, num2):
+        return num1 / num2
+        
+Содержание test_calculator.py:
+
+ 
+import unittest
+from calculator import Calculator
+
+class TestCalculator(unittest.TestCase):
+    def test_add(self):
+        calc = Calculator()
+        result = calc.add(2, 3)
+        self.assertEqual(result, 5)
+
+    def test_subtract(self):
+        calc = Calculator()
+        result = calc.subtract(5, 3)
+        self.assertEqual(result, 2)
+
+    def test_multiply(self):
+        calc = Calculator()
+        result = calc.multiply(4, 3)
+        self.assertEqual(result, 12)
+
+    def test_divide(self):
+        calc = Calculator()
+        result = calc.divide(10, 2)
+        self.assertEqual(result, 5)
+
+if __name__ == '__main__':
+    unittest.main()
+    
+Здесь я написал простые позитивные тесты для каждого метода калькулятора: test_add, test_subtract, test_multiply и test_divide. В каждом из них я создал экземпляр класса Calculator, вызываю нужный метод и сравниваю полученный результат с ожидаемым.
