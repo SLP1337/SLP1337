@@ -1,0 +1,66 @@
+Пример добавления неявных ожиданий в тесте проверки карточек питомцев:
+
+ 
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+
+public class PetCardsTest {
+    public static void main(String[] args) {
+        // Установка пути к драйверу Chrome
+        System.setProperty("webdriver.chrome.driver", "путь_к_драйверу");
+
+        // Создание экземпляра ChromeDriver
+        WebDriver driver = new ChromeDriver();
+
+        // Установка неявного ожидания в 10 секунд
+        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+
+        // Открытие страницы с карточками питомцев
+        driver.get("https://example.com/pet-cards");
+
+        // Ожидание появления всех элементов карточек питомцев
+        List<WebElement> petCards = driver.findElements(By.cssSelector(".pet-card"));
+        Assert.assertEquals(3, petCards.size());
+
+        // Закрытие браузера
+        driver.quit();
+    }
+}
+
+Пример добавления явных ожиданий в тесте проверки таблицы питомцев:
+
+ 
+copy
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+public class PetTableTest {
+    public static void main(String[] args) {
+        // Установка пути к драйверу Chrome
+        System.setProperty("webdriver.chrome.driver", "путь_к_драйверу");
+
+        // Создание экземпляра ChromeDriver
+        WebDriver driver = new ChromeDriver();
+
+        // Открытие страницы с таблицей питомцев
+        driver.get("https://example.com/pet-table");
+
+        // Инициализация объекта WebDriverWait
+        WebDriverWait wait = new WebDriverWait(driver, 10);
+
+        // Явное ожидание появления заголовка таблицы
+        WebElement tableTitle = wait.until(ExpectedConditions.visibilityOfElementLocated(By.cssSelector(".table-title")));
+
+        // Явное ожидание загрузки всех строк таблицы
+        wait.until(ExpectedConditions.presenceOfAllElementsLocatedBy(By.cssSelector(".table-row")));
+
+        // Закрытие браузера
+        driver.quit();
+    }
+}
